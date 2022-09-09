@@ -1,10 +1,18 @@
-package com.example.areader.screens.login
+package com.example.areader.screens.forgot
 
-import androidx.compose.foundation.*
+import android.content.Context
+import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -25,10 +33,7 @@ import com.example.areader.components.*
 
 @Preview
 @Composable
-fun LoginScreen(navController: NavController = NavController(LocalContext.current)) {
-
-    val showLoginForm = rememberSaveable { mutableStateOf(true) }
-
+fun ForgotPasswordScreen(navController: NavController = NavController(LocalContext.current)) {
     Surface(
         Modifier
             .fillMaxSize()
@@ -54,38 +59,29 @@ fun LoginScreen(navController: NavController = NavController(LocalContext.curren
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (showLoginForm.value) UserLoginForm(
-                    loading = false,
-                    navController = navController
-                ) { email, password ->
-                    // Todo: FB Login
-                }
+                UserForgotForm(navController = navController)
             }
         }
 
     }
-
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun UserLoginForm(
+fun UserForgotForm(
     loading: Boolean = false,
     navController: NavController,
-    onDone: (String, String) -> Unit = { email, password ->
+    onDone: (String) -> Unit = { email ->
     }
 ) {
+    val context = LocalContext.current
+
     // save state when user using other task
     val email = rememberSaveable { mutableStateOf("") }
-    val password = rememberSaveable { mutableStateOf("") }
-
-    // help show and hide password
-    val passwordVisibility = rememberSaveable { mutableStateOf(false) }
-    val passwordFocusRequest = FocusRequester.Default
 
     val keyboardController = LocalSoftwareKeyboardController.current
-    val valid = remember(email.value, password.value) {
-        email.value.trim().isNotEmpty() && password.value.trim().isNotEmpty()
+    val valid = remember(email.value) {
+        email.value.trim().isNotEmpty()
     }
 
     Column(
@@ -94,58 +90,28 @@ fun UserLoginForm(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TitleHeader("Login")
+
+        TitleHeader("Forgot\nPassword")
 
         EmailInput(
             modifier = Modifier
                 .padding(start = 10.dp, end = 10.dp),
             emailState = email,
             enabled = !loading,
-            onAction = KeyboardActions(onNext = { passwordFocusRequest.requestFocus() }){
-                onDone(email.value.trim(), password.value.trim())
-            }
-        )
-
-        PasswordInput(
-            modifier = Modifier
-                .focusRequester(passwordFocusRequest)
-                .padding(start = 10.dp, end = 10.dp),
-            passwordState = password,
-            enable = !loading,
-            passwordVisibility = passwordVisibility,
             onAction = KeyboardActions(onDone = { keyboardController?.hide() }) {
-                onDone(email.value.trim(), password.value.trim())
+                onDone(email.value.trim())
             }
         )
-
-        OptionsPassword(navController)
 
         SubmitButton(
-            textId = "Login",
+            textId = "Send",
             loading = loading,
             validInput = valid,
             colorButton = Color(1, 102, 255, 255)
         ) {
-            onDone(email.value.trim(), password.value.trim())
+            Toast.makeText(context, "Check our link in your email!", Toast.LENGTH_LONG).show()
+            onDone(email.value.trim())
             keyboardController?.hide()
         }
-
-        CreateAccount(navController)
-
-        OtherLogin()
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

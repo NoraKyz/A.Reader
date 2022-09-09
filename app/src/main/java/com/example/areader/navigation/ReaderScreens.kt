@@ -1,16 +1,18 @@
 package com.example.areader.navigation
 
 import android.text.style.UpdateAppearance
+import com.example.areader.screens.forgot.ForgotPasswordScreen
 
 enum class ReaderScreens {
     SplashScreen,
     LoginScreen,
     CreateAccountScreen,
-    ReaderHomeScreen,
+    ForgotPasswordScreen,
+    HomeScreen,
     SearchScreen,
     DetailScreen,
     UpdateScreen,
-    ReaderStatsScreen;
+    StatsScreen;
 
     companion object {
         fun fromRoute(route: String?): ReaderScreens
@@ -18,12 +20,14 @@ enum class ReaderScreens {
             SplashScreen.name -> SplashScreen
             LoginScreen.name -> LoginScreen
             CreateAccountScreen.name ->  CreateAccountScreen
-            ReaderHomeScreen.name -> ReaderHomeScreen
+            HomeScreen.name -> HomeScreen
             SearchScreen.name -> SearchScreen
             DetailScreen.name -> DetailScreen
             UpdateScreen.name -> UpdateScreen
-            ReaderStatsScreen.name -> ReaderStatsScreen
-            null -> ReaderHomeScreen
+            StatsScreen.name -> StatsScreen
+            ForgotPasswordScreen.name -> ForgotPasswordScreen
+
+            null -> HomeScreen
             else -> throw IllegalArgumentException("Route $route is not recognized")
         }
     }

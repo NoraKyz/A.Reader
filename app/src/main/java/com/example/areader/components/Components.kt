@@ -1,16 +1,14 @@
 package com.example.areader.components
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,20 +18,43 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.areader.navigation.ReaderScreens
 
+// complete
 @Composable
-fun ReaderLogo(modifier: Modifier = Modifier) {
+fun TitleHeader(headerText: String) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(4.dp)
+    ) {
+        Text(
+            text = headerText,
+            color = Color(113, 92, 248, 255),
+            style = MaterialTheme.typography.h4,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(10.dp),
+            textAlign = TextAlign.Center,
+        )
+    }
+}
+
+// complete
+@Composable
+fun ReaderLogo() {
     Text(
         text = "A.Reader",
-        modifier = modifier.padding(bottom = 16.dp),
+        modifier = Modifier.padding(bottom = 16.dp),
         style = MaterialTheme.typography.h3,
         color = Color.Red.copy(0.5f)
     )
 }
 
-
+// well email input version
 @Composable
 fun EmailInput(
     modifier: Modifier = Modifier,
@@ -42,7 +63,6 @@ fun EmailInput(
     enabled: Boolean = true,
     imeAction: ImeAction = ImeAction.Next,
     onAction: KeyboardActions = KeyboardActions.Default
-
 ) {
     OutlinedTextField(
         value = emailState.value,
@@ -53,23 +73,30 @@ fun EmailInput(
             fontSize = 18.sp,
             color = MaterialTheme.colors.onBackground
         ),
-        modifier = Modifier
+        modifier = modifier
             .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
             .fillMaxWidth(),
         enabled = enabled,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = imeAction),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Text,
+            imeAction = imeAction
+        ),
         leadingIcon = {
-            Icon(imageVector = Icons.Filled.AlternateEmail, contentDescription = "Icon Login")
-        }
-
+            Icon(
+                imageVector = Icons.Filled.AlternateEmail,
+                contentDescription = "Icon Login"
+            )
+        },
+        keyboardActions = onAction
     )
 }
 
+// well password input version
 @Composable
 fun PasswordInput(
     modifier: Modifier,
     passwordState: MutableState<String>,
-    labelId: String,
+    labelId: String = "Password",
     enable: Boolean,
     passwordVisibility: MutableState<Boolean>,
     onAction: KeyboardActions = KeyboardActions.Default,
@@ -88,7 +115,7 @@ fun PasswordInput(
             fontSize = 18.sp,
             color = MaterialTheme.colors.onBackground
         ),
-        modifier = Modifier
+        modifier = modifier
             .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
             .fillMaxWidth(),
         keyboardOptions = KeyboardOptions(
@@ -100,8 +127,12 @@ fun PasswordInput(
             PasswordVisibility(passwordVisibility = passwordVisibility)
         },
         leadingIcon = {
-            Icon(imageVector = Icons.Filled.VpnKey, contentDescription = "Icon Login")
-        }
+            Icon(
+                imageVector = Icons.Filled.VpnKey,
+                contentDescription = "Icon Login"
+            )
+        },
+        keyboardActions = onAction
     )
 }
 
@@ -113,40 +144,48 @@ fun PasswordVisibility(passwordVisibility: MutableState<Boolean>) {
         Icons.Filled.Visibility
     else Icons.Filled.VisibilityOff
 
-    // Please provide localized description for accessibility services
     val description = if (visible) "Hide password" else "Show password"
 
-    IconButton(onClick = {passwordVisibility.value = !visible}){
-        Icon(imageVector  = image, description)
+    IconButton(onClick = { passwordVisibility.value = !visible }) {
+        Icon(imageVector = image, description)
     }
 }
 
+// well button version
 @Composable
-fun LoginButton(loading: Boolean) {
+fun SubmitButton(
+    modifier: Modifier = Modifier,
+    textId: String,
+    loading: Boolean,
+    validInput: Boolean,
+    colorButton: Color = Color.Blue,
+    onClick: () -> Unit
+) {
     Button(
-        onClick = {},
-        enabled = !loading,
-        shape = RoundedCornerShape(45.dp),
-        modifier = Modifier
-            .fillMaxWidth()
+        onClick = onClick,
+        enabled = !loading && validInput,
+        shape = CircleShape,
+        modifier = modifier
+            .fillMaxWidth(0.6f)
             .padding(
-                start = 50.dp,
-                end = 50.dp
+                start = 4.dp,
+                end = 4.dp
             ),
-        content = {
+        colors = ButtonDefaults.buttonColors(backgroundColor = colorButton)
+    ) {
+        if (loading) CircularProgressIndicator(Modifier.fillMaxSize(0.1f))
+        else
             Text(
-                text = "Login",
+                text = textId,
                 color = Color.White,
                 fontWeight = FontWeight.Bold
             )
-        },
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color(1, 102, 255, 255))
-
-    )
+    }
 }
 
+// update later
 @Composable
-fun CreateAccount() {
+fun CreateAccount(navController: NavController) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
@@ -156,13 +195,14 @@ fun CreateAccount() {
         Text(
             text = "Create account",
             modifier = Modifier.clickable {
-
+                navController.navigate(ReaderScreens.CreateAccountScreen.name)
             },
             color = Color.Blue.copy(0.7f)
         )
     }
 }
 
+// coming soon
 @Composable
 fun OtherLogin() {
     Column(
@@ -178,7 +218,87 @@ fun OtherLogin() {
     }
 }
 
+// update later
+@Composable
+fun OptionsPassword(navController: NavController) {
+    var rememberPassword by remember { mutableStateOf(false) }
 
+    Row(
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 4.dp, end = 4.dp)
+    ) {
+        IconButton(
+            onClick = {
+                rememberPassword = !rememberPassword
+            },
+        ) {
+            Icon(
+                imageVector = if (!rememberPassword) Icons.Filled.CheckBoxOutlineBlank else Icons.Filled.CheckBox,
+                contentDescription = "Remember or not your account",
+                tint = Color.Black.copy(0.3f),
+            )
+        }
+
+        Text(text = "Remember me")
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            Text(
+                text = "Forgot Password",
+                modifier = Modifier
+                    .clickable {
+                        navController.navigate(ReaderScreens.ForgotPasswordScreen.name)
+                    }
+                    .padding(end = 5.dp),
+                color = Color.Blue,
+            )
+        }
+
+    }
+}
+
+// well name input version
+@Composable
+fun NameInput(
+    modifier: Modifier = Modifier,
+    nameState: MutableState<String>,
+    labelId: String = "Full Name",
+    enabled: Boolean = true,
+    imeAction: ImeAction = ImeAction.Next,
+    onAction: KeyboardActions = KeyboardActions.Default
+) {
+    OutlinedTextField(
+        value = nameState.value,
+        onValueChange = { nameState.value = it },
+        label = { Text(text = labelId) },
+        singleLine = true,
+        textStyle = TextStyle(
+            fontSize = 18.sp,
+            color = MaterialTheme.colors.onBackground
+        ),
+        modifier = modifier
+            .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
+            .fillMaxWidth(),
+        enabled = enabled,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Text,
+            imeAction = imeAction
+        ),
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Filled.Person,
+                contentDescription = "Icon Login"
+            )
+        },
+        keyboardActions = onAction
+    )
+}
 
 
 

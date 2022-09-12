@@ -22,12 +22,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.areader.R
 import com.example.areader.components.*
+import com.example.areader.navigation.ReaderScreens
 
 @Preview
 @Composable
-fun LoginScreen(navController: NavController = NavController(LocalContext.current)) {
-
-    val showLoginForm = rememberSaveable { mutableStateOf(true) }
+fun LoginScreen(
+    navController: NavController = NavController(LocalContext.current),
+    viewModel: LoginScreenViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
 
     Surface(
         Modifier
@@ -54,11 +56,14 @@ fun LoginScreen(navController: NavController = NavController(LocalContext.curren
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (showLoginForm.value) UserLoginForm(
+                UserLoginForm(
                     loading = false,
                     navController = navController
                 ) { email, password ->
-                    // Todo: FB Login
+                    viewModel.signInWithEmailAndPassword(email, password){
+                        navController.popBackStack()
+                        navController.navigate(ReaderScreens.HomeScreen.name)
+                    }
                 }
             }
         }
@@ -101,7 +106,7 @@ fun UserLoginForm(
                 .padding(start = 10.dp, end = 10.dp),
             emailState = email,
             enabled = !loading,
-            onAction = KeyboardActions(onNext = { passwordFocusRequest.requestFocus() }){
+            onAction = KeyboardActions(onNext = { passwordFocusRequest.requestFocus() }) {
                 onDone(email.value.trim(), password.value.trim())
             }
         )

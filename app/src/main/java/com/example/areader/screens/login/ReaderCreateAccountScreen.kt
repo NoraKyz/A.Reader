@@ -28,10 +28,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.areader.R
 import com.example.areader.components.*
+import com.example.areader.navigation.ReaderScreens
+import com.example.areader.screens.login.LoginScreenViewModel
 
 @Preview
 @Composable
-fun CreateAccountScreen(navController: NavController = NavController(LocalContext.current)) {
+fun CreateAccountScreen(
+    navController: NavController = NavController(LocalContext.current),
+    viewModel: LoginScreenViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
     Surface(
         Modifier
             .fillMaxSize()
@@ -57,7 +62,12 @@ fun CreateAccountScreen(navController: NavController = NavController(LocalContex
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                UserCreateForm(navController = navController)
+                UserCreateForm(navController = navController){email, password, name ->
+                    viewModel.createUserWithEmailAndPassword(name = name, email = email, password = password){
+                        navController.popBackStack()
+                        navController.navigate(ReaderScreens.HomeScreen.name)
+                    }
+                }
             }
         }
 
@@ -69,7 +79,7 @@ fun CreateAccountScreen(navController: NavController = NavController(LocalContex
 fun UserCreateForm(
     loading: Boolean = false,
     navController: NavController,
-    onDone: (String, String, String) -> Unit = { email, password, name ->
+    onDone: (String, String, String) -> Unit = {email, password, name ->
     }
 ) {
     // save state when user using other task
@@ -105,7 +115,7 @@ fun UserCreateForm(
                 .padding(start = 10.dp, end = 10.dp),
             nameState = name,
             enabled = !loading,
-            onAction = KeyboardActions(onNext = { emailFocusRequest.requestFocus() }){
+            onAction = KeyboardActions(onNext = { emailFocusRequest.requestFocus() }) {
                 onDone(email.value.trim(), password.value.trim(), name.value.trim())
             }
         )
@@ -116,7 +126,7 @@ fun UserCreateForm(
                 .focusRequester(emailFocusRequest),
             emailState = email,
             enabled = !loading,
-            onAction = KeyboardActions(onNext = { passwordFocusRequest.requestFocus() }){
+            onAction = KeyboardActions(onNext = { passwordFocusRequest.requestFocus() }) {
                 onDone(email.value.trim(), password.value.trim(), name.value.trim())
             }
         )

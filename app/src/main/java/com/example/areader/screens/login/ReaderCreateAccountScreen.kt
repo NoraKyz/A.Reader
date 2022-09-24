@@ -62,8 +62,8 @@ fun CreateAccountScreen(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                UserCreateForm(navController = navController){email, password, name ->
-                    viewModel.createUserWithEmailAndPassword(name = name, email = email, password = password){
+                UserCreateForm(navController = navController){email, password, displayName ->
+                    viewModel.createUserWithEmailAndPassword(displayName = displayName, email = email, password = password){
                         navController.popBackStack()
                         navController.navigate(ReaderScreens.HomeScreen.name)
                     }
@@ -79,11 +79,11 @@ fun CreateAccountScreen(
 fun UserCreateForm(
     loading: Boolean = false,
     navController: NavController,
-    onDone: (String, String, String) -> Unit = {email, password, name ->
+    onDone: (String, String, String) -> Unit = {email, password, displayName ->
     }
 ) {
     // save state when user using other task
-    val name = rememberSaveable { mutableStateOf("") }
+    val displayName = rememberSaveable { mutableStateOf("") }
     val email = rememberSaveable { mutableStateOf("") }
     val password = rememberSaveable { mutableStateOf("") }
 
@@ -98,7 +98,7 @@ fun UserCreateForm(
     val valid = remember(email.value, password.value) {
         email.value.trim().isNotEmpty()
                 && password.value.trim().isNotEmpty()
-                && name.value.trim().isNotEmpty()
+                && displayName.value.trim().isNotEmpty()
     }
 
     Column(
@@ -113,10 +113,10 @@ fun UserCreateForm(
         NameInput(
             modifier = Modifier
                 .padding(start = 10.dp, end = 10.dp),
-            nameState = name,
+            nameState = displayName,
             enabled = !loading,
             onAction = KeyboardActions(onNext = { emailFocusRequest.requestFocus() }) {
-                onDone(email.value.trim(), password.value.trim(), name.value.trim())
+                onDone(email.value.trim(), password.value.trim(), displayName.value.trim())
             }
         )
 
@@ -127,7 +127,7 @@ fun UserCreateForm(
             emailState = email,
             enabled = !loading,
             onAction = KeyboardActions(onNext = { passwordFocusRequest.requestFocus() }) {
-                onDone(email.value.trim(), password.value.trim(), name.value.trim())
+                onDone(email.value.trim(), password.value.trim(), displayName.value.trim())
             }
         )
 
@@ -139,7 +139,7 @@ fun UserCreateForm(
             enable = !loading,
             passwordVisibility = passwordVisibility,
             onAction = KeyboardActions(onDone = { keyboardController?.hide() }) {
-                onDone(email.value.trim(), password.value.trim(), name.value.trim())
+                onDone(email.value.trim(), password.value.trim(), displayName.value.trim())
             }
         )
 
@@ -149,7 +149,7 @@ fun UserCreateForm(
             validInput = valid,
             colorButton = Color(1, 102, 255, 255)
         ) {
-            onDone(email.value.trim(), password.value.trim(), name.value.trim())
+            onDone(email.value.trim(), password.value.trim(), displayName.value.trim())
             keyboardController?.hide()
         }
     }

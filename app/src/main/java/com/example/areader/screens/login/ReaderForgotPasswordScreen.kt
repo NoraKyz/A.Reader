@@ -1,6 +1,5 @@
 package com.example.areader.screens.forgot
 
-import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,8 +16,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -27,13 +24,21 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.example.areader.R
-import com.example.areader.components.*
+import com.example.areader.components.EmailInput
+import com.example.areader.components.SubmitButton
+import com.example.areader.components.TitleHeader
+import com.example.areader.navigation.ReaderScreens
+import com.example.areader.screens.login.LoginScreenViewModel
 
 @Preview
 @Composable
-fun ForgotPasswordScreen(navController: NavController = NavController(LocalContext.current)) {
+fun ForgotPasswordScreen(
+    navController: NavController = NavController(LocalContext.current),
+    viewModel: LoginScreenViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
     Surface(
         Modifier
             .fillMaxSize()
@@ -59,7 +64,12 @@ fun ForgotPasswordScreen(navController: NavController = NavController(LocalConte
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                UserForgotForm(navController = navController)
+                UserForgotForm(navController = navController) {
+                    viewModel.forgotPasswordWithEmail(it) {
+                        //navController.popBackStack()
+                        //navController.navigate(ReaderScreens.HomeScreen.name)
+                    }
+                }
             }
         }
 

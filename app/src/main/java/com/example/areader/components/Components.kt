@@ -1,8 +1,10 @@
 package com.example.areader.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -11,7 +13,12 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -19,10 +26,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.areader.R
 import com.example.areader.navigation.ReaderScreens
+import com.google.firebase.auth.FirebaseAuth
 
 // complete
 @Composable
@@ -218,9 +228,10 @@ fun OtherLogin() {
     }
 }
 
+@Preview
 // update later
 @Composable
-fun OptionsPassword(navController: NavController) {
+fun OptionsPassword(navController: NavController = NavController(LocalContext.current)) {
     var rememberPassword by remember { mutableStateOf(false) }
 
     Row(
@@ -238,7 +249,6 @@ fun OptionsPassword(navController: NavController) {
             Icon(
                 imageVector = if (!rememberPassword) Icons.Filled.CheckBoxOutlineBlank else Icons.Filled.CheckBox,
                 contentDescription = "Remember or not your account",
-                tint = Color.Black.copy(0.3f),
             )
         }
 
@@ -299,6 +309,270 @@ fun NameInput(
         keyboardActions = onAction
     )
 }
+
+
+@Composable
+fun ReaderHomeAppBar(
+    title: String,
+    showProfile: Boolean = true,
+    navController: NavController
+) {
+    TopAppBar(
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (showProfile) {
+                    Icon(
+                        imageVector = Icons.Filled.Favorite,
+                        contentDescription = "Icon Logo",
+                        modifier = Modifier
+                            .clip(
+                                RoundedCornerShape(12.dp)
+                            )
+                    )
+                }
+
+                Text(
+                    text = title,
+                    color = Color.Red.copy(0.7f),
+                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = {
+                FirebaseAuth.getInstance().signOut().run {
+                    navController.navigate(ReaderScreens.LoginScreen.name)
+                }
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Logout,
+                    contentDescription = "Logout Icon",
+                    tint = Color.Red.copy(0.7f)
+                )
+            }
+        },
+        backgroundColor = Color.White,
+        elevation = 0.dp
+    )
+}
+
+@Composable
+fun FABContent(onTab: (String) -> Unit) {
+    FloatingActionButton(
+        onClick = { onTab("") },
+        shape = RoundedCornerShape(50.dp),
+        backgroundColor = Color(0xFF2CACE6)
+    ) {
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = "Add a book",
+            tint = Color.White
+        )
+    }
+}
+
+@Composable
+fun UserProfile(
+    nameProfile: String,
+    navController: NavController
+) {
+    Row(
+        horizontalArrangement = Arrangement.End,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(end = 8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.AccountCircle,
+                contentDescription = "Profile",
+                tint = MaterialTheme.colors.secondaryVariant,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clickable {
+                        navController.navigate(ReaderScreens.StatsScreen.name)
+                    }
+            )
+            Text(
+                text = nameProfile,
+                fontSize = 17.sp,
+                color = Color.Red.copy(0.8f)
+            )
+        }
+    }
+}
+
+@Composable
+fun TitleSelection(modifier: Modifier = Modifier, label: String) {
+    Surface() {
+        Text(
+            text = label,
+            textAlign = TextAlign.Left,
+            fontSize = 19.sp,
+            modifier = Modifier.padding(start = 16.dp)
+        )
+    }
+}
+
+@Composable
+fun BackGroundWithImage(content: @Composable () -> Unit) {
+    Surface(
+        Modifier
+            .fillMaxSize()
+    ) {
+        // set background by bitmap
+        Image(
+            bitmap = ImageBitmap
+                .imageResource(
+                    id = R.drawable.background_image
+                ),
+            contentDescription = "image background",
+            modifier = Modifier
+                .fillMaxSize(),
+            contentScale = ContentScale.Crop,
+        )
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            content()
+        }
+    }
+}
+
+
+@Composable
+fun BookRating(score: Double) {
+    Surface(
+        shape = RoundedCornerShape(30.dp),
+        elevation = 6.dp,
+        modifier = Modifier.size(height = 60.dp, width = 30.dp)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = Icons.Filled.StarBorder,
+                contentDescription = "Start",
+            )
+
+            Text(
+                text = score.toString(),
+                style = MaterialTheme.typography.subtitle1
+            )
+        }
+    }
+}
+
+@Composable
+fun RoundedButton(
+    label: String = "Reading",
+    radius: Int = 29,
+    onPress: () -> Unit = {},
+
+    ) {
+    Surface(
+        modifier = Modifier.clip(
+            RoundedCornerShape(
+                topStartPercent = radius,
+                bottomEndPercent = radius
+            )
+        ),
+        color = Color(0xFF2094F0)
+    ) {
+        Column(
+            modifier = Modifier
+                .width(80.dp)
+                .heightIn(30.dp)
+                .clickable { onPress.invoke() },
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = label,
+                style = TextStyle(color = Color.White, fontSize = 15.sp)
+            )
+        }
+    }
+}
+
+@Composable
+fun ReaderSearchAppBar(
+    title: String,
+    showProfile: Boolean = true,
+    navController: NavController
+) {
+    TopAppBar(
+        title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = title,
+                    color = Color.Red.copy(0.7f),
+                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                )
+            }
+        },
+        navigationIcon = {
+            IconButton(onClick = {
+                navController.popBackStack()
+                navController.navigate(ReaderScreens.HomeScreen.name)
+            }) {
+                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Logout Icon")
+            }
+        },
+        backgroundColor = Color.White,
+        elevation = 0.dp
+    )
+}
+
+@Composable
+fun SearchInput(
+    modifier: Modifier = Modifier,
+    nameState: MutableState<String>,
+    labelId: String = "Search",
+    enabled: Boolean = true,
+    imeAction: ImeAction = ImeAction.Done,
+    onAction: KeyboardActions = KeyboardActions.Default
+) {
+
+
+    OutlinedTextField(
+        value = nameState.value,
+        onValueChange = { nameState.value = it },
+        label = { Text(text = labelId) },
+        singleLine = true,
+        textStyle = TextStyle(
+            fontSize = 18.sp,
+            color = MaterialTheme.colors.onBackground
+        ),
+        modifier = modifier
+            .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
+            .fillMaxWidth(),
+        enabled = enabled,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Text,
+            imeAction = imeAction
+        ),
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Filled.Search,
+                contentDescription = "Icon Search"
+            )
+        },
+        keyboardActions = onAction
+    )
+
+}
+
+
 
 
 

@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.areader.model.MUser
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -20,38 +21,38 @@ class LoginScreenViewModel : ViewModel() {
     private val _loading = MutableLiveData(false)
     val loading: LiveData<Boolean> = _loading
 
-    fun signInWithEmailAndPassword(email: String, password: String, home: () -> Unit)
-    = viewModelScope.launch {
-        try {
-            auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        Log.d("FB", "signInWithEmailAndPassword: successful ${it.result}")
-                        home()
-                    } else {
-                        Log.d("FB", "signInWithEmailAndPassword: ${it.result}")
+    fun signInWithEmailAndPassword(email: String, password: String, home: () -> Unit) =
+        viewModelScope.launch {
+            try {
+                auth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            Log.d("FB", "signInWithEmailAndPassword: successful ${it.result}")
+                            home()
+                        } else {
+                            Log.d("FB", "signInWithEmailAndPassword: ${it.result}")
+                        }
+
                     }
 
-                }
-
-        } catch (ex: Exception) {
-            Log.d("FB", "signInWithEmailAndPassword: ${ex.message}")
+            } catch (ex: Exception) {
+                Log.d("FB", "signInWithEmailAndPassword: ${ex.message}")
+            }
         }
-    }
 
     fun createUserWithEmailAndPassword(
-        name: String,
+        displayName: String,
         email: String,
         password: String,
         home: () -> Unit
     ) {
-        if(_loading.value == false){
+        if (_loading.value == false) {
             _loading.value = true
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener {
-                    if(it.isSuccessful){
+                    if (it.isSuccessful) {
                         home()
-                        createUser(name)
+                        createUser(displayName)
                     } else {
                         Log.d("FB", "createUserWithEmailAndPassword: ${it.result}")
                     }
@@ -62,12 +63,28 @@ class LoginScreenViewModel : ViewModel() {
 
     }
 
-    private fun createUser(name: String?) {
-        val userId = auth.currentUser?.uid
-        val user = mutableMapOf<String, Any>()
+    fun forgotPasswordWithEmail(email: String, home: () -> Unit) {
+        auth.sendPasswordResetEmail(email)
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    home()
+                } else {
+                    Log.d("FB", "sendPasswordResetEmail: ${it.result}")
+                }
+            }
+    }
 
-        user["user_id"] = userId.toString()
-        user["display_name"] = name.toString()
+    private fun createUser(displayName: String?) {
+        val userId = auth.currentUser?.uid
+
+        val user = MUser(
+            userId = userId.toString(),
+            displayName = displayName.toString(),
+            avatarUrl = "",
+            quote = "Life is great",
+            profession = "Android Developer",
+            id = null
+        ).toMap()
 
         FirebaseFirestore.getInstance().collection("users")
             .add(user)

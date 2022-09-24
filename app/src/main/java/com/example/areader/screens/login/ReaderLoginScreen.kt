@@ -30,47 +30,21 @@ fun LoginScreen(
     navController: NavController = NavController(LocalContext.current),
     viewModel: LoginScreenViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
-
-    Surface(
-        Modifier
-            .fillMaxSize()
-    ) {
-        // set background by bitmap
-        Image(
-            bitmap = ImageBitmap
-                .imageResource(
-                    id = R.drawable.background_image
-                ),
-            contentDescription = "image background",
-            modifier = Modifier
-                .fillMaxSize(),
-            contentScale = ContentScale.Crop,
-        )
-
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            Column(
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                UserLoginForm(
-                    loading = false,
-                    navController = navController
-                ) { email, password ->
-                    viewModel.signInWithEmailAndPassword(email, password){
-                        navController.popBackStack()
-                        navController.navigate(ReaderScreens.HomeScreen.name)
-                    }
-                }
+    BackGroundWithImage {
+        UserLoginForm(
+            loading = false,
+            navController = navController
+        ) { email, password ->
+            viewModel.signInWithEmailAndPassword(email, password) {
+                navController.popBackStack()
+                navController.navigate(ReaderScreens.HomeScreen.name)
             }
         }
-
     }
 
 }
+
+
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable

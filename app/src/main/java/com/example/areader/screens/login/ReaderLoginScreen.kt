@@ -24,11 +24,10 @@ import com.example.areader.R
 import com.example.areader.components.*
 import com.example.areader.navigation.ReaderScreens
 
-@Preview
 @Composable
 fun LoginScreen(
     navController: NavController = NavController(LocalContext.current),
-    viewModel: LoginScreenViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: LoginScreenViewModel
 ) {
     BackGroundWithImage {
         UserLoginForm(
